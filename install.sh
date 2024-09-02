@@ -3,7 +3,7 @@
 # Variables
 REPO_URL="https://github.com/KarlAvec1K/Anet_ET4/archive/refs/heads/main.zip"
 ZIP_FILE="Anet_ET4.zip"
-DESTINATION_FOLDER="/home/pi/test/"
+DESTINATION_FOLDER="/home/pi/printer_data/config/"
 
 # Step 1: Download the repository zip file
 curl -L $REPO_URL -o $ZIP_FILE
