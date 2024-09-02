@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# Display ASCII logo
+echo "   _  __          _                      __ _      "
+echo "  | |/ /         | |   /\               /_ | |     "
+echo "  | ' / __ _ _ __| |  /  \__   _____  ___| | | __  "
+echo "  |  < / _\` | '__| | / /\ \ \ / / _ \/ __| | |/ /  "
+echo "  | . \ (_| | |  | |/ ____ \ V /  __/ (__| |   <   "
+echo "  |_|\_\__,_|_|  |_/_/    \_\_/ \___|\___|_|_|\_\  "
+echo "                                                         "
+echo "  https://github.com/KarlAvec1K/anet-et4"
+echo "                                                         "
+echo "           _   _ ______ _______    ______ _______ _  _   "
+echo "     /\   | \ | |  ____|__   __|  |  ____|__   __| || |  "
+echo "    /  \  |  \| | |__     | |     | |__     | |  | || |_ "
+echo "   / /\ \ | . \` |  __|    | |     |  __|    | |  |__   _|"
+echo "  / ____ \| |\  | |____   | |     | |____   | |     | |  "
+echo " /_/    \_\_| \_|______|  |_|     |______|  |_|     |_|  "
+echo "                                                         " 
+
 # Variables
 REPO_URL="https://github.com/KarlAvec1K/Anet_ET4/archive/refs/heads/main.zip"
 ZIP_FILE="Anet_ET4.zip"
