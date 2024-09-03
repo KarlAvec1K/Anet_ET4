@@ -1,4 +1,5 @@
 Works as is, but knowing myself, it is still a work in progress as I'm always trying to optimize my printer!
+I'm still working on making the original Anet ET4 display work. I will update when it does.
 
 ## Installation
 
