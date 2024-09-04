@@ -11,7 +11,7 @@ echo "                                                         "
 echo "                                                         "
 
 # Variables
-REPO_URL="https://github.com/KarlAvec1K/Anet_ET4/archive/refs/heads/schuh-configs.zip"
+REPO_URL="https://github.com/KarlAvec1K/Anet_ET4/archive/refs/heads/jschuh-configs.zip"
 ZIP_FILE="Anet_ET4.zip"
 DESTINATION_FOLDER="/home/pi/printer_data/config/"
 KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs/"
