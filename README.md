@@ -8,4 +8,5 @@ Big thank you to jschuh for all the macros. source : https://github.com/jschuh/k
 To install the configuration files, simply run the following command in your raspberry pi terminal:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/main/install.sh)
+curl -L https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/jschuh-configs/install.sh | bash
+
