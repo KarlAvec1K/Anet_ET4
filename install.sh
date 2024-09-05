@@ -52,6 +52,10 @@ copy_updated_files() {
     local updated_dirs=()
     local installed_dirs=()
 
+    # Debugging: Check paths
+    echo "Source checksums: $checksums_src"
+    echo "Destination checksums: $checksums_dest"
+
     # Get checksums
     get_checksums $src
     if [ -f $checksums_dest ]; then
