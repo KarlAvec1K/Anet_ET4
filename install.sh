@@ -92,7 +92,7 @@ copy_updated_files() {
         done
     fi
 
-    # Output results
+    # Output results only if there were updates or installations
     if [ $updated_count -gt 0 ] || [ $installed_count -gt 0 ]; then
         echo "Files updated: $updated_count"
         for dir in "${updated_dirs[@]}"; do
