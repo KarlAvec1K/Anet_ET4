@@ -47,19 +47,23 @@ copy_updated_files() {
     local dest=$2
     local checksums_src="$src/checksums.txt"
     local checksums_dest="$dest/checksums.txt"
-    
+    local updated_count=0
+    local installed_count=0
+
     # Get checksums
     get_checksums $src
     if [ -f $checksums_dest ]; then
         # Compare checksums and copy updated files
         while read -r checksum file; do
             if ! grep -q "$file" "$checksums_dest"; then
-                echo "Copying updated file: $file"
+                echo "File needs to be copied: $file"
+                ((installed_count++))
                 cp -f "$file" "$dest"
             else
                 local dest_checksum=$(grep "$file" "$checksums_dest" | awk '{print $1}')
                 if [ "$checksum" != "$dest_checksum" ]; then
-                    echo "Copying updated file: $file"
+                    echo "File needs to be updated: $file"
+                    ((updated_count++))
                     cp -f "$file" "$dest"
                 fi
             fi
@@ -67,7 +71,11 @@ copy_updated_files() {
     else
         # If no checksum file exists, copy all files
         find $src -name '*.cfg' -exec cp -f {} $dest \;
+        installed_count=$(find $src -name '*.cfg' | wc -l)
     fi
+
+    echo "Files updated: $updated_count"
+    echo "Files installed: $installed_count"
 }
 
 # Step 1: Clone or Pull Repository
@@ -92,7 +100,7 @@ mkdir -p $KLIPPER_MACROS_FOLDER
 mkdir -p $OPTIONAL_MACROS_FOLDER
 
 # Step 3: Copy updated files
-echo "Copying updated configuration files..."
+echo "Copying configuration files..."
 copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
 copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
 copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
