@@ -40,6 +40,7 @@ if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
     git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner
 else
     cd $LOCAL_REPO_FOLDER
+    git config pull.ff only   # Set fast-forward only strategy
     git pull origin $REPO_BRANCH & spinner
 fi
 
