@@ -92,8 +92,7 @@ copy_updated_files() {
 }
 
 # Step 1: Clone or Pull Repository
-# echo "Fetching repository..."
- echo "Working..."
+ echo "Fetching repository..."
 if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
     git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner
 else
@@ -105,7 +104,7 @@ fi
 # Debugging: List contents of the local repository folder
 # echo "Listing contents of $LOCAL_REPO_FOLDER:"
 # ls -la $LOCAL_REPO_FOLDER
-
+ echo "Working..."
 # Step 2: Check and Create necessary directories if not exist
 # echo "Checking and creating necessary directories..."
 [ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
