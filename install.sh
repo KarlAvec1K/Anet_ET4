@@ -121,7 +121,5 @@ echo "Working..."
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
 ) & spinner
 
-# Step 4: Clean up
-echo "Cleaning up..."
-wait
+# Step 4: Done
 echo "Update/installation completed successfully."
