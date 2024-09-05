@@ -74,8 +74,8 @@ copy_updated_files() {
         installed_count=$(find $src -name '*.cfg' | wc -l)
     fi
 
-    echo "Files updated: $updated_count"
-    echo "Files installed: $installed_count"
+    echo "Files updated: $updated_count in $dest"
+    echo "Files installed: $installed_count in $dest"
 }
 
 # Step 1: Clone or Pull Repository
