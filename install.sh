@@ -92,12 +92,12 @@ fi
 echo "Listing contents of $LOCAL_REPO_FOLDER:"
 ls -la $LOCAL_REPO_FOLDER
 
-# Step 2: Create necessary directories
-echo "Creating necessary directories..."
-mkdir -p $DESTINATION_FOLDER
-mkdir -p $KLIPPER_CONFIGS_FOLDER
-mkdir -p $KLIPPER_MACROS_FOLDER
-mkdir -p $OPTIONAL_MACROS_FOLDER
+# Step 2: Check and Create necessary directories if not exist
+echo "Checking and creating necessary directories..."
+[ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
+[ ! -d $KLIPPER_CONFIGS_FOLDER ] && mkdir -p $KLIPPER_CONFIGS_FOLDER
+[ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
+[ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
 
 # Step 3: Copy updated files
 echo "Copying configuration files..."
