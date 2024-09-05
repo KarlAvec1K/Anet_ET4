@@ -56,19 +56,19 @@ mkdir -p $KLIPPER_CONFIGS_FOLDER
 mkdir -p $KLIPPER_MACROS_FOLDER
 mkdir -p $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Move files
-echo "Moving configuration files..."
-echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER to $DESTINATION_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER -maxdepth 1 -name '*.cfg' -exec mv -f {} $DESTINATION_FOLDER/ \;
+# Step 3: Copy files
+echo "Copying configuration files..."
+echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER to $DESTINATION_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER -maxdepth 1 -name '*.cfg' -exec cp -f {} $DESTINATION_FOLDER/ \;
 
-echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-configs to $KLIPPER_CONFIGS_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER/klipper-configs -name '*.cfg' -exec mv -f {} $KLIPPER_CONFIGS_FOLDER/ \;
+echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-configs to $KLIPPER_CONFIGS_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER/klipper-configs -name '*.cfg' -exec cp -f {} $KLIPPER_CONFIGS_FOLDER/ \;
 
-echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros to $KLIPPER_MACROS_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros -name '*.cfg' -exec mv -f {} $KLIPPER_MACROS_FOLDER/ \;
+echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros to $KLIPPER_MACROS_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros -name '*.cfg' -exec cp -f {} $KLIPPER_MACROS_FOLDER/ \;
 
-echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional to $OPTIONAL_MACROS_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional -name '*.cfg' -exec mv -f {} $OPTIONAL_MACROS_FOLDER/ \;
+echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional to $OPTIONAL_MACROS_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional -name '*.cfg' -exec cp -f {} $OPTIONAL_MACROS_FOLDER/ \;
 
 # Step 4: Clean up
 echo "Cleaning up..."
