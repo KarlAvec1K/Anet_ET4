@@ -57,28 +57,39 @@ copy_updated_files() {
     if [ -f $checksums_dest ]; then
         # Compare checksums and copy updated files
         while read -r checksum file; do
-            if ! grep -q "$file" "$checksums_dest"; then
-                local dir=$(dirname "$file")
+            local relative_file="${file#$src/}"
+            local dest_file="$dest/$relative_file"
+            if ! grep -q "$relative_file" "$checksums_dest"; then
+                local dir=$(dirname "$dest_file")
                 echo "File needs to be copied: $file"
                 ((installed_count++))
-                installed_dirs+=("$dest")
-                cp -f "$file" "$dest"
+                installed_dirs+=("$dir")
+                mkdir -p "$dir"
+                cp -f "$file" "$dest_file"
             else
-                local dest_checksum=$(grep "$file" "$checksums_dest" | awk '{print $1}')
+                local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
                 if [ "$checksum" != "$dest_checksum" ]; then
-                    local dir=$(dirname "$file")
+                    local dir=$(dirname "$dest_file")
                     echo "File needs to be updated: $file"
                     ((updated_count++))
-                    updated_dirs+=("$dest")
-                    cp -f "$file" "$dest"
+                    updated_dirs+=("$dir")
+                    mkdir -p "$dir"
+                    cp -f "$file" "$dest_file"
                 fi
             fi
         done < "$checksums_src"
     else
         # If no checksum file exists, copy all files
-        find $src -name '*.cfg' -exec cp -f {} $dest \;
-        installed_count=$(find $src -name '*.cfg' | wc -l)
-        installed_dirs+=("$dest")
+        find $src -name '*.cfg' | while read -r file; do
+            local relative_file="${file#$src/}"
+            local dest_file="$dest/$relative_file"
+            local dir=$(dirname "$dest_file")
+            echo "File needs to be copied: $file"
+            ((installed_count++))
+            installed_dirs+=("$dir")
+            mkdir -p "$dir"
+            cp -f "$file" "$dest_file"
+        done
     fi
 
     echo "Files updated: $updated_count"
