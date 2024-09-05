@@ -32,7 +32,7 @@ DESTINATION_FOLDER="/home/pi/printer_data/config"
 KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs"
 KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
 OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
-LOCAL_REPO_FOLDER="/home/pi/Anet_ET4_Config_files"
+LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
 
 # Step 1: Clone or Pull Repository
 echo "Fetching repository..."
