@@ -43,21 +43,32 @@ else
     git pull origin $REPO_BRANCH & spinner
 fi
 
-# Step 2: Move files
-echo "Moving configuration files..."
+# Debugging: List contents of the local repository folder
+echo "Listing contents of $LOCAL_REPO_FOLDER:"
+ls -la $LOCAL_REPO_FOLDER
+
+# Step 2: Create necessary directories
+echo "Creating necessary directories..."
 mkdir -p $DESTINATION_FOLDER
+mkdir -p $KLIPPER_CONFIGS_FOLDER
+mkdir -p $KLIPPER_MACROS_FOLDER
+mkdir -p $OPTIONAL_MACROS_FOLDER
+
+# Step 3: Move files
+echo "Moving configuration files..."
+echo "Moving .cfg files from $LOCAL_REPO_FOLDER to $DESTINATION_FOLDER"
 mv -f $LOCAL_REPO_FOLDER/*.cfg $DESTINATION_FOLDER
 
-mkdir -p $KLIPPER_CONFIGS_FOLDER
+echo "Moving .cfg files from $LOCAL_REPO_FOLDER/klipper-configs to $KLIPPER_CONFIGS_FOLDER"
 mv -f $LOCAL_REPO_FOLDER/klipper-configs/*.cfg $KLIPPER_CONFIGS_FOLDER
 
-mkdir -p $KLIPPER_MACROS_FOLDER
+echo "Moving .cfg files from $LOCAL_REPO_FOLDER/klipper-macros to $KLIPPER_MACROS_FOLDER"
 mv -f $LOCAL_REPO_FOLDER/klipper-macros/*.cfg $KLIPPER_MACROS_FOLDER
 
-mkdir -p $OPTIONAL_MACROS_FOLDER
+echo "Moving .cfg files from $LOCAL_REPO_FOLDER/klipper-macros/optional to $OPTIONAL_MACROS_FOLDER"
 mv -f $LOCAL_REPO_FOLDER/klipper-macros/optional/*.cfg $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Clean up
+# Step 4: Clean up
 echo "Cleaning up..."
 wait
 echo "Update/installation completed successfully."
