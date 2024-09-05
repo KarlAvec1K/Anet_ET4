@@ -49,6 +49,8 @@ copy_updated_files() {
     local checksums_dest="$dest/checksums.txt"
     local updated_count=0
     local installed_count=0
+    local updated_dirs=()
+    local installed_dirs=()
 
     # Get checksums
     get_checksums $src
@@ -56,14 +58,18 @@ copy_updated_files() {
         # Compare checksums and copy updated files
         while read -r checksum file; do
             if ! grep -q "$file" "$checksums_dest"; then
+                local dir=$(dirname "$file")
                 echo "File needs to be copied: $file"
                 ((installed_count++))
+                installed_dirs+=("$dest")
                 cp -f "$file" "$dest"
             else
                 local dest_checksum=$(grep "$file" "$checksums_dest" | awk '{print $1}')
                 if [ "$checksum" != "$dest_checksum" ]; then
+                    local dir=$(dirname "$file")
                     echo "File needs to be updated: $file"
                     ((updated_count++))
+                    updated_dirs+=("$dest")
                     cp -f "$file" "$dest"
                 fi
             fi
@@ -72,10 +78,18 @@ copy_updated_files() {
         # If no checksum file exists, copy all files
         find $src -name '*.cfg' -exec cp -f {} $dest \;
         installed_count=$(find $src -name '*.cfg' | wc -l)
+        installed_dirs+=("$dest")
     fi
 
-    echo "Files updated: $updated_count in $dest"
-    echo "Files installed: $installed_count in $dest"
+    echo "Files updated: $updated_count"
+    for dir in "${updated_dirs[@]}"; do
+        echo "Updated files in directory: $dir"
+    done
+
+    echo "Files installed: $installed_count"
+    for dir in "${installed_dirs[@]}"; do
+        echo "Installed files in directory: $dir"
+    done
 }
 
 # Step 1: Clone or Pull Repository
