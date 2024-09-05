@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Spinner function
+# Spinner function for loading bar
 spinner() {
     local pid=$!
     local delay=0.1
@@ -49,12 +49,6 @@ copy_updated_files() {
     local checksums_dest="$dest/checksums.txt"
     local updated_count=0
     local installed_count=0
-    local updated_dirs=()
-    local installed_dirs=()
-
-    # Debugging: Check paths
-    echo "Source checksums: $checksums_src"
-    echo "Destination checksums: $checksums_dest"
 
     # Get checksums
     get_checksums $src
@@ -65,20 +59,16 @@ copy_updated_files() {
             local dest_file="$dest/$relative_file"
             if ! grep -q "$relative_file" "$checksums_dest"; then
                 local dir=$(dirname "$dest_file")
-                ((installed_count++))
-                installed_dirs+=("$dir")
                 mkdir -p "$dir"
                 cp -f "$file" "$dest_file"
-                echo "File needs to be copied: $file"
+                ((installed_count++))
             else
                 local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
                 if [ "$checksum" != "$dest_checksum" ]; then
                     local dir=$(dirname "$dest_file")
-                    ((updated_count++))
-                    updated_dirs+=("$dir")
                     mkdir -p "$dir"
                     cp -f "$file" "$dest_file"
-                    echo "File needs to be updated: $file"
+                    ((updated_count++))
                 fi
             fi
         done < "$checksums_src"
@@ -88,25 +78,16 @@ copy_updated_files() {
             local relative_file="${file#$src/}"
             local dest_file="$dest/$relative_file"
             local dir=$(dirname "$dest_file")
-            ((installed_count++))
-            installed_dirs+=("$dir")
             mkdir -p "$dir"
             cp -f "$file" "$dest_file"
-            echo "File needs to be copied: $file"
+            ((installed_count++))
         done
     fi
 
-    # Output results only if there were updates or installations
+    # Output results
     if [ $updated_count -gt 0 ] || [ $installed_count -gt 0 ]; then
         echo "Files updated: $updated_count"
-        for dir in "${updated_dirs[@]}"; do
-            echo "Updated files in directory: $dir"
-        done
-
         echo "Files installed: $installed_count"
-        for dir in "${installed_dirs[@]}"; do
-            echo "Installed files in directory: $dir"
-        done
     fi
 }
 
@@ -131,12 +112,14 @@ echo "Checking and creating necessary directories..."
 [ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
 [ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Copy updated files
+# Step 3: Copy updated files with loading bar
 echo "Copying configuration files..."
-copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
-copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
-copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
-copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
+(
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
+) & spinner
 
 # Step 4: Clean up
 echo "Cleaning up..."
