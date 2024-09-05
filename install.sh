@@ -61,20 +61,20 @@ copy_updated_files() {
             local dest_file="$dest/$relative_file"
             if ! grep -q "$relative_file" "$checksums_dest"; then
                 local dir=$(dirname "$dest_file")
-                echo "File needs to be copied: $file"
                 ((installed_count++))
                 installed_dirs+=("$dir")
                 mkdir -p "$dir"
                 cp -f "$file" "$dest_file"
+                echo "File needs to be copied: $file"
             else
                 local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
                 if [ "$checksum" != "$dest_checksum" ]; then
                     local dir=$(dirname "$dest_file")
-                    echo "File needs to be updated: $file"
                     ((updated_count++))
                     updated_dirs+=("$dir")
                     mkdir -p "$dir"
                     cp -f "$file" "$dest_file"
+                    echo "File needs to be updated: $file"
                 fi
             fi
         done < "$checksums_src"
@@ -84,23 +84,26 @@ copy_updated_files() {
             local relative_file="${file#$src/}"
             local dest_file="$dest/$relative_file"
             local dir=$(dirname "$dest_file")
-            echo "File needs to be copied: $file"
             ((installed_count++))
             installed_dirs+=("$dir")
             mkdir -p "$dir"
             cp -f "$file" "$dest_file"
+            echo "File needs to be copied: $file"
         done
     fi
 
-    echo "Files updated: $updated_count"
-    for dir in "${updated_dirs[@]}"; do
-        echo "Updated files in directory: $dir"
-    done
+    # Output results
+    if [ $updated_count -gt 0 ] || [ $installed_count -gt 0 ]; then
+        echo "Files updated: $updated_count"
+        for dir in "${updated_dirs[@]}"; do
+            echo "Updated files in directory: $dir"
+        done
 
-    echo "Files installed: $installed_count"
-    for dir in "${installed_dirs[@]}"; do
-        echo "Installed files in directory: $dir"
-    done
+        echo "Files installed: $installed_count"
+        for dir in "${installed_dirs[@]}"; do
+            echo "Installed files in directory: $dir"
+        done
+    fi
 }
 
 # Step 1: Clone or Pull Repository
