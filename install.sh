@@ -43,14 +43,10 @@ else
     git pull origin $REPO_BRANCH & spinner
 fi
 
-# Step 2: Move files (check existence first)
+# Step 2: Move files
 echo "Moving configuration files..."
-
-if [ -f "$LOCAL_REPO_FOLDER/printer.cfg" ]; then
-    mv -f $LOCAL_REPO_FOLDER/printer.cfg $DESTINATION_FOLDER
-else
-    echo "Warning: printer.cfg not found in $LOCAL_REPO_FOLDER"
-fi
+mkdir -p $DESTINATION_FOLDER
+mv -f $LOCAL_REPO_FOLDER/*.cfg $DESTINATION_FOLDER
 
 mkdir -p $KLIPPER_CONFIGS_FOLDER
 mv -f $LOCAL_REPO_FOLDER/klipper-configs/*.cfg $KLIPPER_CONFIGS_FOLDER
