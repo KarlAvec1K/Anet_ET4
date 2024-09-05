@@ -102,8 +102,8 @@ else
 fi
 
 # Debugging: List contents of the local repository folder
-echo "Listing contents of $LOCAL_REPO_FOLDER:"
-ls -la $LOCAL_REPO_FOLDER
+# echo "Listing contents of $LOCAL_REPO_FOLDER:"
+# ls -la $LOCAL_REPO_FOLDER
 
 # Step 2: Check and Create necessary directories if not exist
 echo "Checking and creating necessary directories..."
