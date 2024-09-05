@@ -33,6 +33,7 @@ KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs"
 KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
 OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
 LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
+LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
 
 # Step 1: Clone or Pull Repository
 echo "Fetching repository..."
@@ -57,17 +58,17 @@ mkdir -p $OPTIONAL_MACROS_FOLDER
 
 # Step 3: Move files
 echo "Moving configuration files..."
-echo "Moving .cfg files from $LOCAL_REPO_FOLDER to $DESTINATION_FOLDER"
-find $LOCAL_REPO_FOLDER -maxdepth 1 -name '*.cfg' -exec mv -f {} $DESTINATION_FOLDER/ \;
+echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER to $DESTINATION_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER -maxdepth 1 -name '*.cfg' -exec mv -f {} $DESTINATION_FOLDER/ \;
 
-echo "Moving .cfg files from $LOCAL_REPO_FOLDER/klipper-configs to $KLIPPER_CONFIGS_FOLDER"
-find $LOCAL_REPO_FOLDER/klipper-configs -name '*.cfg' -exec mv -f {} $KLIPPER_CONFIGS_FOLDER/ \;
+echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-configs to $KLIPPER_CONFIGS_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER/klipper-configs -name '*.cfg' -exec mv -f {} $KLIPPER_CONFIGS_FOLDER/ \;
 
-echo "Moving .cfg files from $LOCAL_REPO_FOLDER/klipper-macros to $KLIPPER_MACROS_FOLDER"
-find $LOCAL_REPO_FOLDER/klipper-macros -name '*.cfg' -exec mv -f {} $KLIPPER_MACROS_FOLDER/ \;
+echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros to $KLIPPER_MACROS_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros -name '*.cfg' -exec mv -f {} $KLIPPER_MACROS_FOLDER/ \;
 
-echo "Moving .cfg files from $LOCAL_REPO_FOLDER/klipper-macros/optional to $OPTIONAL_MACROS_FOLDER"
-find $LOCAL_REPO_FOLDER/klipper-macros/optional -name '*.cfg' -exec mv -f {} $OPTIONAL_MACROS_FOLDER/ \;
+echo "Moving .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional to $OPTIONAL_MACROS_FOLDER"
+find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional -name '*.cfg' -exec mv -f {} $OPTIONAL_MACROS_FOLDER/ \;
 
 # Step 4: Clean up
 echo "Cleaning up..."
