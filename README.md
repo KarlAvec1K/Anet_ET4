@@ -1,5 +1,11 @@
-Works as is, but knowing myself, it is still a work in progress as I'm always trying to optimize my printer!
-I'm still working on making the original Anet ET4 display work. I will update when it does.
+## Hello world!
+
+This is a working, but not optimized code. For now it acts as my backup.
+
+## Jschuh-configs
+
+I'm currently working on the 2nd branch (jschuh-configs) and will merge everything in the main, once I feel it's stable enough.
+Feel free to try the jschuh-configs and leave a review, comment or whatever :)
 
 ## Installation
 
