@@ -92,7 +92,8 @@ copy_updated_files() {
 }
 
 # Step 1: Clone or Pull Repository
-echo "Fetching repository..."
+# echo "Fetching repository..."
+ echo "Working..."
 if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
     git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner
 else
@@ -106,14 +107,14 @@ fi
 # ls -la $LOCAL_REPO_FOLDER
 
 # Step 2: Check and Create necessary directories if not exist
-echo "Checking and creating necessary directories..."
+# echo "Checking and creating necessary directories..."
 [ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
 [ ! -d $KLIPPER_CONFIGS_FOLDER ] && mkdir -p $KLIPPER_CONFIGS_FOLDER
 [ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
 [ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
 
 # Step 3: Copy updated files with loading bar
-echo "Copying configuration files..."
+# echo "Copying configuration files..."
 (
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
