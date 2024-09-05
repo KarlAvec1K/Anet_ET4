@@ -14,7 +14,7 @@ echo "                                                         "
 REPO_URL="https://github.com/KarlAvec1K/Anet_ET4/archive/refs/heads/jschuh-configs.zip"
 ZIP_FILE="Anet_ET4.zip"
 DESTINATION_FOLDER="/home/pi/printer_data/config/"
-KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs/"
+KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-macros/"
 
 # Step 1: Download the repository zip file from the schuh-configs branch
 curl -L $REPO_URL -o $ZIP_FILE
@@ -29,7 +29,7 @@ mkdir -p $DESTINATION_FOLDER
 mv -f $CONFIG_FOLDER/*.cfg $DESTINATION_FOLDER
 
 # Step 4: Move the klipper-configs folder to the destination folder, overwriting if it exists
-KLIPPER_CONFIGS_SRC="$UNZIPPED_FOLDER/klipper-configs"
+KLIPPER_CONFIGS_SRC="$UNZIPPED_FOLDER/klipper-macros"
 mkdir -p $KLIPPER_CONFIGS_FOLDER
 mv -f $KLIPPER_CONFIGS_SRC/*.cfg $KLIPPER_CONFIGS_FOLDER
 
