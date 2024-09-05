@@ -35,6 +35,41 @@ OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
 LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
 LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
 
+# Function to get checksums
+get_checksums() {
+    local dir=$1
+    find $dir -type f -name '*.cfg' -exec md5sum {} \; | sort -k 2 > "$dir/checksums.txt"
+}
+
+# Function to copy updated files
+copy_updated_files() {
+    local src=$1
+    local dest=$2
+    local checksums_src="$src/checksums.txt"
+    local checksums_dest="$dest/checksums.txt"
+    
+    # Get checksums
+    get_checksums $src
+    if [ -f $checksums_dest ]; then
+        # Compare checksums and copy updated files
+        while read -r checksum file; do
+            if ! grep -q "$file" "$checksums_dest"; then
+                echo "Copying updated file: $file"
+                cp -f "$file" "$dest"
+            else
+                local dest_checksum=$(grep "$file" "$checksums_dest" | awk '{print $1}')
+                if [ "$checksum" != "$dest_checksum" ]; then
+                    echo "Copying updated file: $file"
+                    cp -f "$file" "$dest"
+                fi
+            fi
+        done < "$checksums_src"
+    else
+        # If no checksum file exists, copy all files
+        find $src -name '*.cfg' -exec cp -f {} $dest \;
+    fi
+}
+
 # Step 1: Clone or Pull Repository
 echo "Fetching repository..."
 if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
@@ -56,19 +91,12 @@ mkdir -p $KLIPPER_CONFIGS_FOLDER
 mkdir -p $KLIPPER_MACROS_FOLDER
 mkdir -p $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Copy files
-echo "Copying configuration files..."
-echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER to $DESTINATION_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER -maxdepth 1 -name '*.cfg' -exec cp -f {} $DESTINATION_FOLDER/ \;
-
-echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-configs to $KLIPPER_CONFIGS_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER/klipper-configs -name '*.cfg' -exec cp -f {} $KLIPPER_CONFIGS_FOLDER/ \;
-
-echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros to $KLIPPER_MACROS_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros -name '*.cfg' -exec cp -f {} $KLIPPER_MACROS_FOLDER/ \;
-
-echo "Copying .cfg files from $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional to $OPTIONAL_MACROS_FOLDER"
-find $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional -name '*.cfg' -exec cp -f {} $OPTIONAL_MACROS_FOLDER/ \;
+# Step 3: Copy updated files
+echo "Copying updated configuration files..."
+copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
+copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
+copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
+copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
 
 # Step 4: Clean up
 echo "Cleaning up..."
