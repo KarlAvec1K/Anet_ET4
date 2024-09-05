@@ -9,5 +9,4 @@ Source : https://github.com/jschuh/klipper-macros
 To install the configuration files, simply run the following command in your raspberry pi terminal:
 
 ```bash
-curl -L https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/jschuh-configs/install.sh | bash
-
+bash <(curl -sL https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/jschuh-configs/install.sh)
