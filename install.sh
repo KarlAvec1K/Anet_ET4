@@ -27,7 +27,7 @@ echo "@@@@%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@######%%%%%%%%%
 echo "@@@@%%%%%%%%%%%%%%######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#######%%%%%%%%%%%%%&@@@"
 echo "@@@@@%%%%%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@@@@@@@@@######%%%%%%%%%%%%%%%@@@@@"
 echo "@@@@@@@@%%%%%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@@@@@######%%%%%%%%%%%%%%@@@@@@@@"
-echo "@@@@@@@@@@@%%%%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@######%%%%%%%%%%%%%%%@@@@@@@@@@"
+echo "@@@@@@@@@@%%%%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@######%%%%%%%%%%%%%%%@@@@@@@@@@"
 echo "@@@@@@@@@@@@@%%%%%%%%%%%%%%%#######@@@@@@@@@@@@@######%%%%%%%%%%%%%%@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%#######@@@@@@@@@@######%%%%%%%%%%%%%%%@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%#######@@@@@@@@@######%%%%%%%%%%%%%@@@@@@@@@@@@@@@@"
@@ -90,14 +90,14 @@ copy_updated_files() {
                 if ! grep -q "$relative_file" "$checksums_dest"; then
                     local dir=$(dirname "$dest_file")
                     mkdir -p "$dir"
-                    cp -f "$file" "$dest_file"
+                    cp -f "$file" "$dest_file" || { echo "Failed to copy $file to $dest_file"; exit 1; }
                     ((installed_count++))
                 else
                     local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
                     if [ "$checksum" != "$dest_checksum" ]; then
                         local dir=$(dirname "$dest_file")
                         mkdir -p "$dir"
-                        cp -f "$file" "$dest_file"
+                        cp -f "$file" "$dest_file" || { echo "Failed to copy $file to $dest_file"; exit 1; }
                         ((updated_count++))
                     fi
                 fi
@@ -109,7 +109,7 @@ copy_updated_files() {
                 local dest_file="$dest/$relative_file"
                 local dir=$(dirname "$dest_file")
                 mkdir -p "$dir"
-                cp -f "$file" "$dest_file"
+                cp -f "$file" "$dest_file" || { echo "Failed to copy $file to $dest_file"; exit 1; }
                 ((installed_count++))
             done
         fi
@@ -194,7 +194,7 @@ copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" "$KLIPPER_MACROS_F
 # Specific handling for printer.cfg
 echo "Copying printer.cfg..."
 if [ -f "$LOCAL_REPO_CONFIG_FOLDER/printer.cfg" ]; then
-    cp -f "$LOCAL_REPO_CONFIG_FOLDER/printer.cfg" "$DESTINATION_FOLDER/"
+    cp -f "$LOCAL_REPO_CONFIG_FOLDER/printer.cfg" "$DESTINATION_FOLDER/" || { echo "Failed to copy printer.cfg"; exit 1; }
     echo "printer.cfg has been copied to $DESTINATION_FOLDER/"
 else
     echo "printer.cfg does not exist in the source directory."
