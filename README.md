@@ -23,7 +23,7 @@ The new install.sh script not only installs the necessary files but also functio
 #### Simply run the following command in your raspberry pi terminal:
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/dev/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/main/install.sh)
 ```
 
 ## Slicer Configuration
