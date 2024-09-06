@@ -129,7 +129,7 @@ if [ ! -d "$LOCAL_MACRO_REPO_FOLDER" ]; then
 else
     cd $LOCAL_MACRO_REPO_FOLDER
     git config pull.ff only   # Set fast-forward only strategy
-    git pull origin master & spinner
+    git pull origin main & spinner
 fi
 
 # Step 3: Check and Create necessary directories if not exist
