@@ -17,4 +17,4 @@ I'm still working on making the original Anet ET4 display work with klipper but 
 To install the configuration files, simply run the following command in your raspberry pi terminal:
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/jschuh-configs/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/KarlAvec1K/Anet_ET4/dev/install.sh)
