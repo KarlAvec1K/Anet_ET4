@@ -80,7 +80,11 @@ print_help() {
 # Function to get checksums
 get_checksums() {
     local dir=$1
-    find $dir -type f -name '*.cfg' -exec md5sum {} \; | sort -k 2 > "$dir/checksums.txt"
+    if [ -d "$dir" ]; then
+        find $dir -type f -name '*.cfg' -exec md5sum {} \; | sort -k 2 > "$dir/checksums.txt"
+    else
+        echo "Directory $dir does not exist. Skipping checksum generation."
+    fi
 }
 
 # Function to copy updated files
@@ -191,7 +195,6 @@ fi
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
-) & spinner
+)
 
-# Step 5: Done
-echo "Update/installation completed successfully."
+echo "Installation complete."
