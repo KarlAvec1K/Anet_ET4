@@ -44,10 +44,12 @@ echo "@@@@@%%%@@@@@%%##@@@%%%@@@%%%@@@%%%@@@%%%@@@@%%%@@%%%%@@@%%%%@@@%@@@@%%%@@
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%&@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%&@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "                                                                                "
+
 # Variables
 REPO_URL="https://github.com/KarlAvec1K/Anet_ET4.git"
 MACRO_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
-REPO_BRANCH="main"
+REPO_BRANCH="jschuh-configs"
+MACRO_BRANCH="main"  # Change to the appropriate branch
 DESTINATION_FOLDER="/home/pi/printer_data/config"
 KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs"
 KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
@@ -125,11 +127,11 @@ fi
 # Step 2: Clone or Pull klipper-macros Repository
 echo "Fetching klipper-macros repository..."
 if [ ! -d "$LOCAL_MACRO_REPO_FOLDER" ]; then
-    git clone $MACRO_REPO_URL $LOCAL_MACRO_REPO_FOLDER & spinner
+    git clone -b $MACRO_BRANCH $MACRO_REPO_URL $LOCAL_MACRO_REPO_FOLDER & spinner
 else
     cd $LOCAL_MACRO_REPO_FOLDER
     git config pull.ff only   # Set fast-forward only strategy
-    git pull origin main & spinner
+    git pull origin $MACRO_BRANCH & spinner
 fi
 
 # Step 3: Check and Create necessary directories if not exist
