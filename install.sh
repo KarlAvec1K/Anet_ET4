@@ -199,7 +199,7 @@ fi
 # Step 4: Copy updated files
 echo "Copying updated files..."
 copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
-copy_updated_files "LOCAL_REPO_MACROS_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
+copy_updated_files "$LOCAL_REPO_MACROS_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
 
 # Remove checksums
 echo "Removing old checksum files..."
