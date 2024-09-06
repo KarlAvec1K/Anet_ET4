@@ -43,8 +43,6 @@ echo "@@@@@%%%@@%%%##@@@@@%%%@@@%%%@@@%%&@@@@%%%@@@%%@@@@@%%@@%%%%%%%%%%@@@%%%@@
 echo "@@@@@%%%@@@@@%%##@@@%%%@@@%%%@@@%%%@@@%%%@@@@%%%@@%%%%@@@%%%%@@@%@@@@%%%@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%&@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%&@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 echo "                                                                                "
 
 # Variables
@@ -56,8 +54,25 @@ KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
 OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
 LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
 LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
-KLIPPER_MACROS_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
-LOCAL_KLIPPER_MACROS_REPO_FOLDER="/home/pi/klipper-macros"
+VERBOSE=false
+BACKUP=false
+
+# Function for error handling
+error_exit() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+# Help menu
+print_help() {
+    echo "Usage: install.sh [options]"
+    echo
+    echo "Options:"
+    echo "  -v, --verbose      Enable verbose output"
+    echo "  -b, --backup       Backup existing configuration files before installation"
+    echo "  -h, --help         Show this help menu"
+    exit 0
+}
 
 # Function to get checksums
 get_checksums() {
@@ -115,40 +130,65 @@ copy_updated_files() {
     fi
 }
 
+# Backup existing config files
+backup_existing_files() {
+    local dir=$1
+    local backup_dir="$dir/backup_$(date +%Y%m%d_%H%M%S)"
+    mkdir -p $backup_dir
+    find $dir -name '*.cfg' -exec mv {} $backup_dir/ \;
+    echo "Backup of existing configuration files created at $backup_dir."
+}
+
+# Parse arguments
+while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
+  -v | --verbose )
+    VERBOSE=true
+    ;;
+  -b | --backup )
+    BACKUP=true
+    ;;
+  -h | --help )
+    print_help
+    ;;
+esac; shift; done
+
 # Step 1: Clone or Pull Repository
 echo "Fetching repository..."
 if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
-    git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner
+    if $VERBOSE; then
+        git clone -v -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER || error_exit "Failed to clone repository."
+    else
+        git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner || error_exit "Failed to clone repository."
+    fi
 else
-    cd $LOCAL_REPO_FOLDER
-    git config pull.ff only   # Set fast-forward only strategy
-    git pull origin $REPO_BRANCH & spinner
+    cd $LOCAL_REPO_FOLDER || error_exit "Failed to navigate to local repository."
+    git config pull.ff only || error_exit "Failed to set git pull strategy."
+    if $VERBOSE; then
+        git pull origin $REPO_BRANCH || error_exit "Failed to pull updates."
+    else
+        git pull origin $REPO_BRANCH & spinner || error_exit "Failed to pull updates."
+    fi
 fi
 
-# Clone klipper-macros repository from the main branch
-echo "Fetching klipper-macros repository..."
-if [ ! -d "$LOCAL_KLIPPER_MACROS_REPO_FOLDER" ]; then
-    git clone -b main $KLIPPER_MACROS_REPO_URL $LOCAL_KLIPPER_MACROS_REPO_FOLDER & spinner
-else
-    cd $LOCAL_KLIPPER_MACROS_REPO_FOLDER
-    git config pull.ff only   # Set fast-forward only strategy
-    git pull origin main & spinner
-fi
-
-echo "Working..."
 # Step 2: Check and Create necessary directories if not exist
 [ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
 [ ! -d $KLIPPER_CONFIGS_FOLDER ] && mkdir -p $KLIPPER_CONFIGS_FOLDER
 [ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
 [ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Copy updated files with loading bar
+# Step 3: Backup if requested
+if $BACKUP; then
+    echo "Backing up existing files..."
+    backup_existing_files $DESTINATION_FOLDER
+fi
+
+# Step 4: Copy updated files
 (
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
-    copy_updated_files $LOCAL_KLIPPER_MACROS_REPO_FOLDER $KLIPPER_MACROS_FOLDER
-    copy_updated_files $LOCAL_KLIPPER_MACROS_REPO_FOLDER/optional $OPTIONAL_MACROS_FOLDER
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
 ) & spinner
 
-# Step 4: Done
+# Step 5: Done
 echo "Update/installation completed successfully."
