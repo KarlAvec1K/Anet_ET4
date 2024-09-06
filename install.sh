@@ -183,28 +183,23 @@ fi
 echo "Working..."
 
 # Step 2: Check and Create necessary directories if not exist
-echo "Checking and creating necessary directories..."
 mkdir -p "$DESTINATION_FOLDER"
 mkdir -p "$KLIPPER_CONFIGS_FOLDER"
 mkdir -p "$KLIPPER_MACROS_FOLDER"
 mkdir -p "$OPTIONAL_MACROS_FOLDER"
 
-# Step 3: Backup existing files if option -b is set
-if [ "$BACKUP" = true ]; then
-    echo "Creating backups..."
-    tar -czf "$DESTINATION_FOLDER/backup_$(date +%F_%T).tar.gz" -C "$DESTINATION_FOLDER" .
+# Step 3: Copy Updated Files
+echo "Copying files..."
+copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER" "$DESTINATION_FOLDER"
+copy_updated_files "$LOCAL_REPO_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
+copy_updated_files "$LOCAL_REPO_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
+
+# Specific handling for printer.cfg
+echo "Copying printer.cfg..."
+if [ -f "$LOCAL_REPO_CONFIG_FOLDER/printer.cfg" ]; then
+    cp -f "$LOCAL_REPO_CONFIG_FOLDER/printer.cfg" "$DESTINATION_FOLDER/"
+    echo "printer.cfg has been copied to $DESTINATION_FOLDER/"
 fi
 
-# Step 4: Copy updated files
-echo "Copying updated files..."
-copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
-copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
-
-# Remove checksums
-echo "Removing old checksum files..."
-rm -f "$KLIPPER_CONFIGS_FOLDER/checksums.txt"
-rm -f "$KLIPPER_MACROS_FOLDER/checksums.txt"
-rm -f "$OPTIONAL_MACROS_FOLDER/checksums.txt"
-
-# Complete
-echo "Update complete."
+# Summary
+echo "Files copied to destination folders."
