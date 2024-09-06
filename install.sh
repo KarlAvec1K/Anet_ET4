@@ -169,7 +169,7 @@ else
 fi
 
 echo "Fetching klipper-macros repository..."
-if [ ! -d "$LOCAL_REPO_FOLDER/klipper-macros" ]; then
+if [ ! -d "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" ]; then
     git clone -b $KLIPPER_MACROS_REPO_BRANCH $KLIPPER_MACROS_REPO_URL "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" & spinner
 else
     cd "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros"
@@ -188,8 +188,8 @@ mkdir -p "$OPTIONAL_MACROS_FOLDER"
 # Step 3: Copy Updated Files
 echo "Copying files..."
 copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER" "$DESTINATION_FOLDER"
-copy_updated_files "$LOCAL_REPO_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
-copy_updated_files "$LOCAL_REPO_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
+copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
+copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
 
 # Specific handling for printer.cfg
 echo "Copying printer.cfg..."
