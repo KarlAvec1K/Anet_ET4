@@ -57,31 +57,14 @@ KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
 OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
 LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
 LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
-VERBOSE=false
-BACKUP=false
-
-# Function for error handling
-error_exit() {
-    echo "Error: $1" >&2
-    exit 1
-}
-
-# Help menu
-print_help() {
-    echo "Usage: install.sh [options]"
-    echo
-    echo "Options:"
-    echo "  -v, --verbose      Enable verbose output"
-    echo "  -b, --backup       Backup existing configuration files before installation"
-    echo "  -h, --help         Show this help menu"
-    exit 0
-}
+KLIPPER_MACROS_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
+KLIPPER_MACROS_REPO_BRANCH="main"
 
 # Function to get checksums
 get_checksums() {
     local dir=$1
     if [ -d "$dir" ]; then
-        find $dir -type f -name '*.cfg' -exec md5sum {} \; | sort -k 2 > "$dir/checksums.txt"
+        find "$dir" -type f -name '*.cfg' -exec md5sum {} \; | sort -k 2 > "$dir/checksums.txt"
     else
         echo "Directory $dir does not exist. Skipping checksum generation."
     fi
@@ -96,38 +79,42 @@ copy_updated_files() {
     local updated_count=0
     local installed_count=0
 
-    # Get checksums
-    get_checksums $src
-    if [ -f $checksums_dest ]; then
-        # Compare checksums and copy updated files
-        while read -r checksum file; do
-            local relative_file="${file#$src/}"
-            local dest_file="$dest/$relative_file"
-            if ! grep -q "$relative_file" "$checksums_dest"; then
+    if [ -d "$src" ]; then
+        # Get checksums
+        get_checksums "$src"
+        if [ -f "$checksums_dest" ]; then
+            # Compare checksums and copy updated files
+            while read -r checksum file; do
+                local relative_file="${file#$src/}"
+                local dest_file="$dest/$relative_file"
+                if ! grep -q "$relative_file" "$checksums_dest"; then
+                    local dir=$(dirname "$dest_file")
+                    mkdir -p "$dir"
+                    cp -f "$file" "$dest_file"
+                    ((installed_count++))
+                else
+                    local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
+                    if [ "$checksum" != "$dest_checksum" ]; then
+                        local dir=$(dirname "$dest_file")
+                        mkdir -p "$dir"
+                        cp -f "$file" "$dest_file"
+                        ((updated_count++))
+                    fi
+                fi
+            done < "$checksums_src"
+        else
+            # If no checksum file exists, copy all files
+            find "$src" -name '*.cfg' | while read -r file; do
+                local relative_file="${file#$src/}"
+                local dest_file="$dest/$relative_file"
                 local dir=$(dirname "$dest_file")
                 mkdir -p "$dir"
                 cp -f "$file" "$dest_file"
                 ((installed_count++))
-            else
-                local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
-                if [ "$checksum" != "$dest_checksum" ]; then
-                    local dir=$(dirname "$dest_file")
-                    mkdir -p "$dir"
-                    cp -f "$file" "$dest_file"
-                    ((updated_count++))
-                fi
-            fi
-        done < "$checksums_src"
+            done
+        fi
     else
-        # If no checksum file exists, copy all files
-        find $src -name '*.cfg' | while read -r file; do
-            local relative_file="${file#$src/}"
-            local dest_file="$dest/$relative_file"
-            local dir=$(dirname "$dest_file")
-            mkdir -p "$dir"
-            cp -f "$file" "$dest_file"
-            ((installed_count++))
-        done
+        echo "Source directory $src does not exist. Skipping file copy."
     fi
 
     # Output results
@@ -137,64 +124,87 @@ copy_updated_files() {
     fi
 }
 
-# Backup existing config files
-backup_existing_files() {
-    local dir=$1
-    local backup_dir="$dir/backup_$(date +%Y%m%d_%H%M%S)"
-    mkdir -p $backup_dir
-    find $dir -name '*.cfg' -exec mv {} $backup_dir/ \;
-    echo "Backup of existing configuration files created at $backup_dir."
+# Function to handle script options
+handle_options() {
+    local OPTIND opt
+    while getopts ":b:v:h" opt; do
+        case ${opt} in
+            b )
+                BACKUP=true
+                ;;
+            v )
+                VERBOSE=true
+                ;;
+            h )
+                echo "Usage: $0 [-b] [-v] [-h]"
+                echo "  -b, --backup    Create a backup of existing configuration files before updating."
+                echo "  -v, --verbose   Enable verbose output."
+                echo "  -h, --help      Display this help message."
+                exit 0
+                ;;
+            \? )
+                echo "Invalid option: -$OPTARG" >&2
+                exit 1
+                ;;
+            : )
+                echo "Invalid option: -$OPTARG requires an argument" >&2
+                exit 1
+                ;;
+        esac
+    done
+    shift $((OPTIND -1))
 }
 
-# Parse arguments
-while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
-  -v | --verbose )
-    VERBOSE=true
-    ;;
-  -b | --backup )
-    BACKUP=true
-    ;;
-  -h | --help )
-    print_help
-    ;;
-esac; shift; done
+# Handle options
+handle_options "$@"
 
 # Step 1: Clone or Pull Repository
-echo "Fetching repository..."
+echo "Fetching Anet_ET4 repository..."
 if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
-    if $VERBOSE; then
-        git clone -v -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER || error_exit "Failed to clone repository."
-    else
-        git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner || error_exit "Failed to clone repository."
-    fi
+    git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner
 else
-    cd $LOCAL_REPO_FOLDER || error_exit "Failed to navigate to local repository."
-    git config pull.ff only || error_exit "Failed to set git pull strategy."
-    if $VERBOSE; then
-        git pull origin $REPO_BRANCH || error_exit "Failed to pull updates."
-    else
-        git pull origin $REPO_BRANCH & spinner || error_exit "Failed to pull updates."
-    fi
+    cd $LOCAL_REPO_FOLDER
+    git config pull.ff only   # Set fast-forward only strategy
+    git pull origin $REPO_BRANCH & spinner
 fi
+
+echo "Fetching klipper-macros repository..."
+if [ ! -d "$LOCAL_REPO_FOLDER/klipper-macros" ]; then
+    git clone -b $KLIPPER_MACROS_REPO_BRANCH $KLIPPER_MACROS_REPO_URL "$LOCAL_REPO_FOLDER/klipper-macros" & spinner
+else
+    cd "$LOCAL_REPO_FOLDER/klipper-macros"
+    git config pull.ff only   # Set fast-forward only strategy
+    git pull origin $KLIPPER_MACROS_REPO_BRANCH & spinner
+fi
+
+echo "Working..."
 
 # Step 2: Check and Create necessary directories if not exist
-[ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
-[ ! -d $KLIPPER_CONFIGS_FOLDER ] && mkdir -p $KLIPPER_CONFIGS_FOLDER
-[ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
-[ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
+echo "Checking and creating necessary directories..."
+mkdir -p $DESTINATION_FOLDER
+mkdir -p $KLIPPER_CONFIGS_FOLDER
+mkdir -p $KLIPPER_MACROS_FOLDER
+mkdir -p $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Backup if requested
-if $BACKUP; then
-    echo "Backing up existing files..."
-    backup_existing_files $DESTINATION_FOLDER
+# Backup existing configuration files if requested
+if [ "$BACKUP" = true ]; then
+    echo "Backing up existing configuration files..."
+    TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+    BACKUP_FOLDER="/home/pi/backup_$TIMESTAMP"
+    mkdir -p "$BACKUP_FOLDER"
+    cp -r $DESTINATION_FOLDER/* "$BACKUP_FOLDER/"
 fi
 
-# Step 4: Copy updated files
-(
-    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
-    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
-    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
-    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
-)
+# Step 3: Copy updated files with loading bar
+echo "Copying updated files..."
+copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
+copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
 
-echo "Installation complete."
+# Remove checksums
+echo "Removing old checksum files..."
+rm -f $KLIPPER_CONFIGS_FOLDER/checksums.txt
+rm -f $KLIPPER_MACROS_FOLDER/checksums.txt
+rm -f $OPTIONAL_MACROS_FOLDER/checksums.txt
+
+# Complete
+echo "Update complete."
