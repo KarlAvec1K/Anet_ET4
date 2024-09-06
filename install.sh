@@ -57,6 +57,7 @@ KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
 OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
 LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
 LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
+LOCAL_REPO_MACROS_FOLDER="$LOCAL_REPO_FOLDER/"
 KLIPPER_MACROS_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
 KLIPPER_MACROS_REPO_BRANCH="main"
 
@@ -198,7 +199,7 @@ fi
 # Step 4: Copy updated files
 echo "Copying updated files..."
 copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
-copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
+copy_updated_files "LOCAL_REPO_MACROS_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
 
 # Remove checksums
 echo "Removing old checksum files..."
