@@ -2,10 +2,10 @@
 
 This is a working, but not optimized code. For now it acts as my backup.
 
-## Jschuh-configs
+## dev
 
-I'm currently working on the 2nd branch (jschuh-configs) and will merge everything in the main, once I feel it's stable enough.
-Feel free to try the jschuh-configs and leave a review, comment or whatever :)
+I'm currently working on the 2nd branch (dev) and will merge everything in the main, once I feel it's stable enough.
+Feel free to try the dev branch and leave a review, comment or whatever :)
 
 ## Installation
 
