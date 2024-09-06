@@ -47,7 +47,7 @@ echo "                                                                          
 # Variables
 REPO_URL="https://github.com/KarlAvec1K/Anet_ET4.git"
 MACRO_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
-REPO_BRANCH="dev"
+REPO_BRANCH="main"
 DESTINATION_FOLDER="/home/pi/printer_data/config"
 KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs"
 KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
