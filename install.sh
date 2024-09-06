@@ -27,12 +27,14 @@ echo "                                                         "
 
 # Variables
 REPO_URL="https://github.com/KarlAvec1K/Anet_ET4.git"
-REPO_BRANCH="jschuh-configs"
+MACRO_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
+REPO_BRANCH="dev"
 DESTINATION_FOLDER="/home/pi/printer_data/config"
 KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs"
 KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
 OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
 LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
+LOCAL_MACRO_REPO_FOLDER="/home/pi/klipper-macros"
 LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
 
 # Function to get checksums
@@ -101,25 +103,29 @@ else
     git pull origin $REPO_BRANCH & spinner
 fi
 
-# Debugging: List contents of the local repository folder
-# echo "Listing contents of $LOCAL_REPO_FOLDER:"
-# ls -la $LOCAL_REPO_FOLDER
-echo "Working..."
-# Step 2: Check and Create necessary directories if not exist
-# echo "Checking and creating necessary directories..."
+# Step 2: Clone or Pull klipper-macros Repository
+echo "Fetching klipper-macros repository..."
+if [ ! -d "$LOCAL_MACRO_REPO_FOLDER" ]; then
+    git clone $MACRO_REPO_URL $LOCAL_MACRO_REPO_FOLDER & spinner
+else
+    cd $LOCAL_MACRO_REPO_FOLDER
+    git config pull.ff only   # Set fast-forward only strategy
+    git pull origin master & spinner
+fi
+
+# Step 3: Check and Create necessary directories if not exist
 [ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
 [ ! -d $KLIPPER_CONFIGS_FOLDER ] && mkdir -p $KLIPPER_CONFIGS_FOLDER
 [ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
 [ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
 
-# Step 3: Copy updated files with loading bar
-# echo "Copying configuration files..."
+# Step 4: Copy updated files with loading bar
 (
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
     copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
-    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros $KLIPPER_MACROS_FOLDER
-    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-macros/optional $OPTIONAL_MACROS_FOLDER
+    copy_updated_files $LOCAL_MACRO_REPO_FOLDER $KLIPPER_MACROS_FOLDER
+    copy_updated_files $LOCAL_MACRO_REPO_FOLDER/optional $OPTIONAL_MACROS_FOLDER
 ) & spinner
 
-# Step 4: Done
+# Step 5: Done
 echo "Update/installation completed successfully."
