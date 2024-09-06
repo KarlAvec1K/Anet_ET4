@@ -79,6 +79,9 @@ copy_updated_files() {
     local updated_count=0
     local installed_count=0
 
+    echo "Source directory for copying: $src"
+    echo "Destination directory: $dest"
+
     if [ -d "$src" ]; then
         # Get checksums
         get_checksums "$src"
@@ -181,30 +184,27 @@ echo "Working..."
 
 # Step 2: Check and Create necessary directories if not exist
 echo "Checking and creating necessary directories..."
-mkdir -p $DESTINATION_FOLDER
-mkdir -p $KLIPPER_CONFIGS_FOLDER
-mkdir -p $KLIPPER_MACROS_FOLDER
-mkdir -p $OPTIONAL_MACROS_FOLDER
+mkdir -p "$DESTINATION_FOLDER"
+mkdir -p "$KLIPPER_CONFIGS_FOLDER"
+mkdir -p "$KLIPPER_MACROS_FOLDER"
+mkdir -p "$OPTIONAL_MACROS_FOLDER"
 
-# Backup existing configuration files if requested
+# Step 3: Backup existing files if option -b is set
 if [ "$BACKUP" = true ]; then
-    echo "Backing up existing configuration files..."
-    TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-    BACKUP_FOLDER="/home/pi/backup_$TIMESTAMP"
-    mkdir -p "$BACKUP_FOLDER"
-    cp -r $DESTINATION_FOLDER/* "$BACKUP_FOLDER/"
+    echo "Creating backups..."
+    tar -czf "$DESTINATION_FOLDER/backup_$(date +%F_%T).tar.gz" -C "$DESTINATION_FOLDER" .
 fi
 
-# Step 3: Copy updated files with loading bar
+# Step 4: Copy updated files
 echo "Copying updated files..."
 copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-configs" "$KLIPPER_CONFIGS_FOLDER"
 copy_updated_files "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" "$KLIPPER_MACROS_FOLDER"
 
 # Remove checksums
 echo "Removing old checksum files..."
-rm -f $KLIPPER_CONFIGS_FOLDER/checksums.txt
-rm -f $KLIPPER_MACROS_FOLDER/checksums.txt
-rm -f $OPTIONAL_MACROS_FOLDER/checksums.txt
+rm -f "$KLIPPER_CONFIGS_FOLDER/checksums.txt"
+rm -f "$KLIPPER_MACROS_FOLDER/checksums.txt"
+rm -f "$OPTIONAL_MACROS_FOLDER/checksums.txt"
 
 # Complete
 echo "Update complete."
