@@ -1,44 +1,150 @@
 #!/bin/bash
 
+# Spinner function for loading bar
+spinner() {
+    local pid=$!
+    local delay=0.1
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
 # Display ASCII logo
-echo "   _  __          _                      __ _      "
-echo "  | |/ /         | |   /\               /_ | |     "
-echo "  | ' / __ _ _ __| |  /  \__   _____  ___| | | __  "
-echo "  |  < / _\` | '__| | / /\ \ \ / / _ \/ __| | |/ /  "
-echo "  | . \ (_| | |  | |/ ____ \ V /  __/ (__| |   <   "
-echo "  |_|\_\__,_|_|  |_/_/    \_\_/ \___|\___|_|_|\_\  "
-echo "                                                         "
-echo "  https://github.com/KarlAvec1K/anet-et4"
-echo "                                                         "
-echo "           _   _ ______ _______    ______ _______ _  _   "
-echo "     /\   | \ | |  ____|__   __|  |  ____|__   __| || |  "
-echo "    /  \  |  \| | |__     | |     | |__     | |  | || |_ "
-echo "   / /\ \ | . \` |  __|    | |     |  __|    | |  |__   _|"
-echo "  / ____ \| |\  | |____   | |     | |____   | |     | |  "
-echo " /_/    \_\_| \_|______|  |_|     |______|  |_|     |_|  "
-echo "                                                         " 
-
+echo "                                                                                "
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@%######&@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@######%&@@@"
+echo "@@@@%%%%######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#######%%%&@@@"
+echo "@@@@%%%%%%#######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@######%%%%%%&@@@"
+echo "@@@@%%%%%%%%%######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#######%%%%%%%%&@@@"
+echo "@@@@%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@######%%%%%%%%%%%&@@@"
+echo "@@@@%%%%%%%%%%%%%%######@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#######%%%%%%%%%%%%%&@@@"
+echo "@@@@@%%%%%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@@@@@@@@@@@######%%%%%%%%%%%%%%%@@@@@"
+echo "@@@@@@@@%%%%%%%%%%%%%%%######@@@@@@@@@@@@@@@@@@@@@@&######%%%%%%%%%%%%%%@@@@@@@@"
+echo "@@@@@@@@@@@%%%%%%%%%%%%%%#######@@@@@@@@@@@@@@@@@######%%%%%%%%%%%%%%%@@@@@@@@@@"
+echo "@@@@@@@@@@@@@%%%%%%%%%%%%%%%######@@@@@@@@@@@@@######%%%%%%%%%%%%%%@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%#######@@@@@@@######%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%%######@@@######%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%%#########%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%%#####%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%#####%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%#####%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@%%%@@@@@%%%##@@%%%@@@#################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@%%%@@@%%%#@@@@@%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@%%%#%%##@@@@@@@%%%@@@%%%@@@%%%%%%%%@@@@@%%%%%%%%@@@@@%%%%%%%@@@@%%%%%%%@@@@"
+echo "@@@@@%%%@%%#@@@@@@@@%%%@@@%%%@@@%%&@@@@%%%@@@%%@@@@&%%@@&%%@@@@@%%@@@%%%@@@@@@@@"
+echo "@@@@@%%%@@%%%##@@@@@%%%@@@%%%@@@%%&@@@@%%%@@@%%@@@@@%%@@%%%%%%%%%%@@@%%%@@@@@@@@"
+echo "@@@@@%%%@@@@@%%##@@@%%%@@@%%%@@@%%%@@@%%%@@@@%%%@@%%%%@@@%%%%@@@%@@@@%%%@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%&@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%&@@@@@@@@@@%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "                                                                                "
 # Variables
-REPO_URL="https://github.com/KarlAvec1K/Anet_ET4/archive/refs/heads/main.zip"
-ZIP_FILE="Anet_ET4.zip"
-DESTINATION_FOLDER="/home/pi/printer_data/config/"
+REPO_URL="https://github.com/KarlAvec1K/Anet_ET4.git"
+MACRO_REPO_URL="https://github.com/KarlAvec1K/klipper-macros.git"
+REPO_BRANCH="dev"
+DESTINATION_FOLDER="/home/pi/printer_data/config"
+KLIPPER_CONFIGS_FOLDER="$DESTINATION_FOLDER/klipper-configs"
+KLIPPER_MACROS_FOLDER="$DESTINATION_FOLDER/klipper-macros"
+OPTIONAL_MACROS_FOLDER="$KLIPPER_MACROS_FOLDER/optional"
+LOCAL_REPO_FOLDER="/home/pi/Anet_ET4"
+LOCAL_MACRO_REPO_FOLDER="/home/pi/klipper-macros"
+LOCAL_REPO_CONFIG_FOLDER="$LOCAL_REPO_FOLDER/Anet_ET4_Config_files"
 
-# Step 1: Download the repository zip file
-curl -L $REPO_URL -o $ZIP_FILE
+# Function to get checksums
+get_checksums() {
+    local dir=$1
+    find $dir -type f -name '*.cfg' -exec md5sum {} \; | sort -k 2 > "$dir/checksums.txt"
+}
 
-# Step 2: Unzip the downloaded file
-unzip $ZIP_FILE
+# Function to copy updated files
+copy_updated_files() {
+    local src=$1
+    local dest=$2
+    local checksums_src="$src/checksums.txt"
+    local checksums_dest="$dest/checksums.txt"
+    local updated_count=0
+    local installed_count=0
 
-# Step 3: Move the .cfg files to the destination folder, overwriting if they exist
-UNZIPPED_FOLDER=$(unzip -Z1 $ZIP_FILE | head -n 1 | cut -f1 -d "/")
-CONFIG_FOLDER="$UNZIPPED_FOLDER/Anet_ET4_Config_files"
-mkdir -p $DESTINATION_FOLDER
-mv -f $CONFIG_FOLDER/*.cfg $DESTINATION_FOLDER
+    # Get checksums
+    get_checksums $src
+    if [ -f $checksums_dest ]; then
+        # Compare checksums and copy updated files
+        while read -r checksum file; do
+            local relative_file="${file#$src/}"
+            local dest_file="$dest/$relative_file"
+            if ! grep -q "$relative_file" "$checksums_dest"; then
+                local dir=$(dirname "$dest_file")
+                mkdir -p "$dir"
+                cp -f "$file" "$dest_file"
+                ((installed_count++))
+            else
+                local dest_checksum=$(grep "$relative_file" "$checksums_dest" | awk '{print $1}')
+                if [ "$checksum" != "$dest_checksum" ]; then
+                    local dir=$(dirname "$dest_file")
+                    mkdir -p "$dir"
+                    cp -f "$file" "$dest_file"
+                    ((updated_count++))
+                fi
+            fi
+        done < "$checksums_src"
+    else
+        # If no checksum file exists, copy all files
+        find $src -name '*.cfg' | while read -r file; do
+            local relative_file="${file#$src/}"
+            local dest_file="$dest/$relative_file"
+            local dir=$(dirname "$dest_file")
+            mkdir -p "$dir"
+            cp -f "$file" "$dest_file"
+            ((installed_count++))
+        done
+    fi
 
-# Step 4: Clean up
-rm -rf $ZIP_FILE $UNZIPPED_FOLDER
+    # Output results
+    if [ $updated_count -gt 0 ] || [ $installed_count -gt 0 ]; then
+        echo "Files updated: $updated_count"
+        echo "Files installed: $installed_count"
+    fi
+}
 
-# Optional: Delete the script itself if running from a local script
-# rm -- "$0"
+# Step 1: Clone or Pull Repository
+echo "Fetching repository..."
+if [ ! -d "$LOCAL_REPO_FOLDER" ]; then
+    git clone -b $REPO_BRANCH $REPO_URL $LOCAL_REPO_FOLDER & spinner
+else
+    cd $LOCAL_REPO_FOLDER
+    git config pull.ff only   # Set fast-forward only strategy
+    git pull origin $REPO_BRANCH & spinner
+fi
 
-echo "Installation completed successfully."
+# Step 2: Clone or Pull klipper-macros Repository
+echo "Fetching klipper-macros repository..."
+if [ ! -d "$LOCAL_MACRO_REPO_FOLDER" ]; then
+    git clone $MACRO_REPO_URL $LOCAL_MACRO_REPO_FOLDER & spinner
+else
+    cd $LOCAL_MACRO_REPO_FOLDER
+    git config pull.ff only   # Set fast-forward only strategy
+    git pull origin master & spinner
+fi
+
+# Step 3: Check and Create necessary directories if not exist
+[ ! -d $DESTINATION_FOLDER ] && mkdir -p $DESTINATION_FOLDER
+[ ! -d $KLIPPER_CONFIGS_FOLDER ] && mkdir -p $KLIPPER_CONFIGS_FOLDER
+[ ! -d $KLIPPER_MACROS_FOLDER ] && mkdir -p $KLIPPER_MACROS_FOLDER
+[ ! -d $OPTIONAL_MACROS_FOLDER ] && mkdir -p $OPTIONAL_MACROS_FOLDER
+
+# Step 4: Copy updated files with loading bar
+(
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER $DESTINATION_FOLDER
+    copy_updated_files $LOCAL_REPO_CONFIG_FOLDER/klipper-configs $KLIPPER_CONFIGS_FOLDER
+    copy_updated_files $LOCAL_MACRO_REPO_FOLDER $KLIPPER_MACROS_FOLDER
+    copy_updated_files $LOCAL_MACRO_REPO_FOLDER/optional $OPTIONAL_MACROS_FOLDER
+) & spinner
+
+# Step 5: Done
+echo "Update/installation completed successfully."
