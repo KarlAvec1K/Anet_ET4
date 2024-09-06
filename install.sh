@@ -173,9 +173,9 @@ fi
 
 echo "Fetching klipper-macros repository..."
 if [ ! -d "$LOCAL_REPO_FOLDER/klipper-macros" ]; then
-    git clone -b $KLIPPER_MACROS_REPO_BRANCH $KLIPPER_MACROS_REPO_URL "$LOCAL_REPO_FOLDER/klipper-macros" & spinner
+    git clone -b $KLIPPER_MACROS_REPO_BRANCH $KLIPPER_MACROS_REPO_URL "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros" & spinner
 else
-    cd "$LOCAL_REPO_FOLDER/klipper-macros"
+    cd "$LOCAL_REPO_CONFIG_FOLDER/klipper-macros"
     git config pull.ff only   # Set fast-forward only strategy
     git pull origin $KLIPPER_MACROS_REPO_BRANCH & spinner
 fi
