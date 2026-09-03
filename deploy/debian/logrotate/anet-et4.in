@@ -1,0 +1,9 @@
+/home/__ANET_USER__/printer_data/logs/*.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    copytruncate
+    su __ANET_USER__ __ANET_USER__
+}

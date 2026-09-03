@@ -1,0 +1,6 @@
+[Unit]
+Description=Anet ET4 configuration backup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/anet-et4-backup --user __ANET_USER__

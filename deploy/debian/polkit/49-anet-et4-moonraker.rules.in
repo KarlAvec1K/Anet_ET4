@@ -1,0 +1,6 @@
+polkit.addRule(function(action, subject) {
+    if (subject.user == "__ANET_USER__" &&
+        action.id == "org.freedesktop.systemd1.manage-units") {
+        return polkit.Result.YES;
+    }
+});

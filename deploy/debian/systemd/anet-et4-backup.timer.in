@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Anet ET4 configuration backup
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

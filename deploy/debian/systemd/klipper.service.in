@@ -1,0 +1,22 @@
+[Unit]
+Description=Klipper 3D printer firmware host service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=__ANET_USER__
+Group=__ANET_USER__
+SupplementaryGroups=dialout
+WorkingDirectory=/home/__ANET_USER__/klipper
+ExecStart=/home/__ANET_USER__/klippy-env/bin/python /home/__ANET_USER__/klipper/klippy/klippy.py /home/__ANET_USER__/printer_data/config/printer.cfg -l /home/__ANET_USER__/printer_data/logs/klippy.log -I /home/__ANET_USER__/printer_data/comms/klippy.sock
+Restart=always
+RestartSec=10
+Nice=5
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+LimitNOFILE=65536
+UMask=027
+
+[Install]
+WantedBy=multi-user.target

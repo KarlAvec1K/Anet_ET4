@@ -1,0 +1,22 @@
+[Unit]
+Description=Moonraker API server for Klipper
+Wants=network-online.target
+After=network-online.target klipper.service
+
+[Service]
+Type=simple
+User=__ANET_USER__
+Group=__ANET_USER__
+SupplementaryGroups=dialout
+WorkingDirectory=/home/__ANET_USER__/moonraker
+ExecStart=/home/__ANET_USER__/moonraker-env/bin/python /home/__ANET_USER__/moonraker/moonraker/moonraker.py -c /home/__ANET_USER__/printer_data/config/moonraker.conf -d /home/__ANET_USER__/printer_data -l /home/__ANET_USER__/printer_data/logs/moonraker.log
+Restart=always
+RestartSec=10
+Nice=5
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+LimitNOFILE=65536
+UMask=027
+
+[Install]
+WantedBy=multi-user.target

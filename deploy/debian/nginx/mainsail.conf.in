@@ -1,0 +1,33 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name __HOSTNAME__ _;
+
+    allow 127.0.0.1;
+    allow ::1;
+    allow __TRUSTED_LAN_CIDR__;
+    deny all;
+
+    root /var/www/mainsail;
+    index index.html;
+    client_max_body_size 1G;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /websocket {
+        proxy_pass http://127.0.0.1:7125/websocket;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    location ~ ^/(server|printer|machine|access|api|debug|database|history|job_queue|timelapse|files) {
+        proxy_pass http://127.0.0.1:7125;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

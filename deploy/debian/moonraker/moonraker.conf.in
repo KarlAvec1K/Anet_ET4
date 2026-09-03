@@ -1,0 +1,23 @@
+[server]
+host: 127.0.0.1
+port: 7125
+klippy_uds_address: /home/__ANET_USER__/printer_data/comms/klippy.sock
+
+[authorization]
+trusted_clients:
+    127.0.0.1
+    ::1
+    __TRUSTED_LAN_CIDR__
+cors_domains:
+    http://__HOSTNAME__
+    http://__HOSTNAME__.local
+
+[file_manager]
+enable_object_processing: True
+
+[data_store]
+temperature_store_size: 3600
+gcode_store_size: 1000
+
+[machine]
+provider: systemd_dbus
