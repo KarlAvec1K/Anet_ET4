@@ -1,0 +1,10 @@
+--- a/klipper-macros/start_end.cfg
++++ b/klipper-macros/start_end.cfg
+@@ -306,6 +306,6 @@
+   # TODO: Instead of blindly using the loaded mesh we could probe a few key
+   # points on the saved grid. If those probes show that the saved grid is no
+   # longer in tolerance we could just run BED_MESH_CALIBRATE_FAST anyway.
+   {% if not printer.bed_mesh.profile_name %}
+-    BED_MESH_CALIBRATE_FAST {rawparams}
++    _KM_BED_MESH_CALIBRATE_BASE ADAPTIVE=1
+   {% endif %}

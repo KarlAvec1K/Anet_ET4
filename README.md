@@ -47,7 +47,7 @@ Review the configuration diff before using `--apply`. Add `--enable-firewall` on
 
 `Anet_ET4_Config_files/` contains the printer-specific baseline. The configured MCU connection is under `/dev/serial/by-id/`; do not replace it with `/dev/ttyUSB0`.
 
-The print-start mesh override calls Klipper's native adaptive mesh after the existing `klipper-macros` start phases. It leaves the `BED_MESH_CALIBRATE_FAST` wrapper available for manual commands. Cura 5.14 users can copy [the phased machine start G-code](examples/cura-5.14-machine-start.gcode); it passes first-layer bounds to the existing adaptive `DRAW_PURGE_LINE`. `SMART_PARK` is intentionally not enabled because `klipper-macros` already calls `PARK` when the nozzle needs to wait for its target temperature.
+The ET4 uses Klipper's native adaptive mesh from the existing `_km_mesh_if_needed` macro in `klipper-macros/start_end.cfg`; the recorded one-line change is [here](Anet_ET4_Config_files/klipper-configs/overrides/klipper-macros-adaptive-mesh.patch). Keep `BED_MESH_CALIBRATE_FAST` for manual meshes. Cura 5.14 users can copy [the phased machine start G-code](examples/cura-5.14-machine-start.gcode); it passes first-layer bounds to the existing `DRAW_PURGE_LINE`. `SMART_PARK` is not enabled because `klipper-macros` already calls `PARK` while the nozzle waits for its target temperature.
 
 The default limits, thermistors, pins, endstops, heater settings, and motion values are hardware-specific. Do not copy them to a different ET4 revision without comparing the board and wiring first.
 

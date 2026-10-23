@@ -16,16 +16,14 @@ grep -Fq 'ip saddr __TRUSTED_LAN_CIDR__ tcp dport { 22, 80 } accept' "$repo_root
 
 grep -Fq '[mcu]' "$repo_root/Anet_ET4_Config_files/klipper-configs/Micro-controller.cfg"
 grep -Fq 'serial: /dev/serial/by-id/' "$repo_root/Anet_ET4_Config_files/klipper-configs/Micro-controller.cfg"
-grep -Fq '[include klipper-configs/overrides/adaptive-mesh.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg"
 test -s "$repo_root/Anet_ET4_Config_files/klipper-configs/display-et4.cfg"
 grep -Fq '[board_pins et4_display]' "$repo_root/Anet_ET4_Config_files/klipper-configs/display-et4.cfg"
-grep -Fq 'rename_existing: _ET4_KM_MESH_IF_NEEDED_BASE' "$repo_root/Anet_ET4_Config_files/klipper-configs/overrides/adaptive-mesh.cfg"
-grep -Fq '_KM_BED_MESH_CALIBRATE_BASE ADAPTIVE=1' "$repo_root/Anet_ET4_Config_files/klipper-configs/overrides/adaptive-mesh.cfg"
-macro_include_line=$(grep -nF '[include klipper-macros/*.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg" | cut -d: -f1)
-adaptive_include_line=$(grep -nF '[include klipper-configs/overrides/adaptive-mesh.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg" | cut -d: -f1)
-bed_mesh_include_line=$(grep -nF '[include klipper-macros/optional/bed_mesh.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg" | cut -d: -f1)
-test "$macro_include_line" -lt "$adaptive_include_line"
-test "$adaptive_include_line" -lt "$bed_mesh_include_line"
+test -s "$repo_root/Anet_ET4_Config_files/klipper-configs/overrides/klipper-macros-adaptive-mesh.patch"
+grep -Fq '_KM_BED_MESH_CALIBRATE_BASE ADAPTIVE=1' "$repo_root/Anet_ET4_Config_files/klipper-configs/overrides/klipper-macros-adaptive-mesh.patch"
+if grep -Fq 'adaptive-mesh.cfg' "$repo_root/Anet_ET4_Config_files/printer.cfg"; then
+    echo "Do not include the failed rename_existing adaptive mesh override." >&2
+    exit 1
+fi
 grep -Fq 'MESH_MIN={initial_layer_bb_min_x},{initial_layer_bb_min_y}' "$repo_root/examples/cura-5.14-machine-start.gcode"
 grep -Fq 'MESH_MAX={initial_layer_bb_max_x},{initial_layer_bb_max_y}' "$repo_root/examples/cura-5.14-machine-start.gcode"
 grep -Fq '_PRINT_START_PHASE_PURGE' "$repo_root/examples/cura-5.14-machine-start.gcode"
