@@ -16,6 +16,19 @@ grep -Fq 'ip saddr __TRUSTED_LAN_CIDR__ tcp dport { 22, 80 } accept' "$repo_root
 
 grep -Fq '[mcu]' "$repo_root/Anet_ET4_Config_files/klipper-configs/Micro-controller.cfg"
 grep -Fq 'serial: /dev/serial/by-id/' "$repo_root/Anet_ET4_Config_files/klipper-configs/Micro-controller.cfg"
+grep -Fq '[include klipper-configs/overrides/adaptive-mesh.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg"
+test -s "$repo_root/Anet_ET4_Config_files/klipper-configs/display-et4.cfg"
+grep -Fq '[board_pins et4_display]' "$repo_root/Anet_ET4_Config_files/klipper-configs/display-et4.cfg"
+grep -Fq 'rename_existing: _ET4_KM_MESH_IF_NEEDED_BASE' "$repo_root/Anet_ET4_Config_files/klipper-configs/overrides/adaptive-mesh.cfg"
+grep -Fq '_KM_BED_MESH_CALIBRATE_BASE ADAPTIVE=1' "$repo_root/Anet_ET4_Config_files/klipper-configs/overrides/adaptive-mesh.cfg"
+macro_include_line=$(grep -nF '[include klipper-macros/*.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg" | cut -d: -f1)
+adaptive_include_line=$(grep -nF '[include klipper-configs/overrides/adaptive-mesh.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg" | cut -d: -f1)
+bed_mesh_include_line=$(grep -nF '[include klipper-macros/optional/bed_mesh.cfg]' "$repo_root/Anet_ET4_Config_files/printer.cfg" | cut -d: -f1)
+test "$macro_include_line" -lt "$adaptive_include_line"
+test "$adaptive_include_line" -lt "$bed_mesh_include_line"
+grep -Fq 'MESH_MIN={initial_layer_bb_min_x},{initial_layer_bb_min_y}' "$repo_root/examples/cura-5.14-machine-start.gcode"
+grep -Fq 'MESH_MAX={initial_layer_bb_max_x},{initial_layer_bb_max_y}' "$repo_root/examples/cura-5.14-machine-start.gcode"
+grep -Fq '_PRINT_START_PHASE_PURGE' "$repo_root/examples/cura-5.14-machine-start.gcode"
 if grep -R -nE '/dev/ttyUSB[0-9]+' "$repo_root/Anet_ET4_Config_files"; then
     echo "A volatile ttyUSB path is committed." >&2
     exit 1
@@ -27,6 +40,8 @@ done
 
 grep -Fq '/dev/serial/by-id/' "$repo_root/docs/installation-debian-13-mini-pc.md"
 grep -Fq 'Never heat' "$repo_root/docs/hardware-safety.md"
+grep -Fq 'DRAW_PURGE_LINE' "$repo_root/docs/operations.md"
+grep -Fq 'SMART_PARK' "$repo_root/docs/operations.md"
 
 if grep -R -nE '(BEGIN( |_)?[A-Z ]*PRIVATE KEY|password[[:space:]]*=|PRIVATE_KEY)' --exclude-dir=.git "$repo_root/deploy" "$repo_root/scripts"; then
     echo "Potential secret found in deployment content." >&2
