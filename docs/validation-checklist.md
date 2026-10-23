@@ -18,3 +18,11 @@
 - [ ] Thermistors, heaters, nozzle, bed, fans, endstops, motors, and wiring are inspected.
 - [ ] Any first motion, homing, extrusion, or heating test is explicitly authorized and supervised.
 - [ ] Conservative first-print settings are selected; no aggressive speed, acceleration, or temperature profile is imported.
+
+## Observed supervised smoke test — 2026-10-23
+
+- [x] Native adaptive mesh path completed using a synthetic 40 x 40 mm object; Klipper adapted the configured area to 60 x 60 mm and probed a 3 x 3 grid. The mesh was temporary and cleared afterward.
+- [x] Existing `DRAW_PURGE_LINE` macro ran for a reduced 5 mm purge plus its configured 12 mm prime at a 210 C nozzle target. The bed heater stayed off. Klipper commanded 17.05194 mm of extrusion.
+- [x] Klipper remained `ready`; print state remained `standby`; heater targets were set back to zero; temporary mesh and object data were cleared.
+- [ ] Visually confirm filament flow and the resulting line; this is not confirmed by Klipper's commanded extrusion distance.
+- [ ] Test the slicer-generated object bounds and run a supervised complete first print after all physical inspection items above are complete.
